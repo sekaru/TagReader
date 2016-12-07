@@ -144,7 +144,7 @@ public class TagReader {
 		
 		for(int i=0; i<lines.size(); i++) {
 			bw.write(lines.get(i));
-			bw.close();
 		}
+		bw.close();
 	}
 }
