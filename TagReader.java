@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 
@@ -28,6 +27,13 @@ public class TagReader {
 			read();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				reader.close();
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -41,18 +47,7 @@ public class TagReader {
 	}
 	
 	public String getData(String tag) {
-		for(int i=0; i<lines.size(); i++) {
-			// check for the tag
-			if(lines.get(i).startsWith("<" + tag + ">")) {
-				// replace the tag bit with nothing so you're left with just the data
-				String data = lines.get(i).replace("<" + tag + ">", "");
-				
-				// return the data
-				return data;
-			}
-		}
-		
-		return null;
+		return getData(tag, "");
 	}
 	
 	public String getData(String tag, String defaultData) {
@@ -71,19 +66,7 @@ public class TagReader {
 	}
 	
 	public String[] getParameterData(String tag) {
-		for(int i=0; i<lines.size(); i++) {
-			// check for the tag
-			if(lines.get(i).startsWith("<" + tag + ">")) {
-				// replace the tag bit with nothing so you're left with just the data
-				String data = lines.get(i).replace("<" + tag + ">", "");
-				String[] parameters = data.split("\\|");
-				
-				// return the data
-				return parameters;
-			}
-		}
-		
-		return null;
+		return getParameterData(tag, new String[]{});
 	}
 	
 	public String[] getParameterData(String tag, String[] defaults) {
@@ -118,7 +101,7 @@ public class TagReader {
 		BufferedWriter bw = new BufferedWriter(fw);
 		
 		String tagAndData = "<" + tag + ">" + data;
-		bw.write(tagAndData);
+		bw.write(tagAndData + "\n");
 		bw.close();
 		
 		// add it to our list of lines
@@ -133,17 +116,12 @@ public class TagReader {
 			}
 		}
 		
-		// clear the file
-		PrintWriter writer = new PrintWriter(file);
-		writer.print("");
-		writer.close();
-		
 		// write all the lines
 		FileWriter fw = new FileWriter(file.getAbsolutePath());
 		BufferedWriter bw = new BufferedWriter(fw);
 		
 		for(int i=0; i<lines.size(); i++) {
-			bw.write(lines.get(i));
+			bw.write(lines.get(i) + "\n");
 		}
 		bw.close();
 	}
